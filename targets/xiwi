@@ -37,8 +37,8 @@ if [ "${DISTROAKA:-"$DISTRO"}" = 'debian' ]; then
 fi
 
 if [ -n "$backport" ]; then
-    install --minimal "xserver-xorg$ltspackages" "xserver-xorg-core$backport" \
-        "libgl1-mesa-glx$ltspackages"
+    install --minimal "xserver-xorg$backport" "xserver-xorg-core$backport" \
+        "libgl1-mesa-glx$backport"
 fi
 install xorg xserver-xorg-video-dummy$backport
 install --minimal i3
