@@ -29,4 +29,4 @@ DEBOOTSTRAP_DIR="$tmp" $FAKEROOT \
     "$RELEASE" "$tmp/$subdir" "$MIRROR" 1>&2
 
 echo 'Remove /dev files as not needed'
-rm ${tmp}/${subdir}/dev/*
+rm -rf ${tmp}/${subdir}/dev/*
