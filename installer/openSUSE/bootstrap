@@ -11,7 +11,6 @@
 CUR=`pwd`
 
 # Grab the latest release of debootstrap
-cd "$tmp"; 
 echo 'Downloading latest debootstrap...' 1>&2
 d='https://raw.githubusercontent.com/mbgg/debootstrap/chromeos-v1/debootstrap.sh'
 if ! wget --no-verbose --timeout=60 -t2 ${d}
@@ -21,7 +20,7 @@ then
     exit 1
 fi
 chmod 755 debootstrap.sh
-cd ..
+mv debootstrap.sh "$tmp/"
 
 # Grab the release and drop it into the subdirectory
 echo 'Downloading bootstrap files...' 1>&2
