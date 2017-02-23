@@ -102,9 +102,9 @@ EOF
     rpmbuild --define='_rpmdir ${tmp}' -bb ${tmp}/dummy.spec > ${tmp}/build.log
     if [ $? != 0 ]
     then
-        echo "ERROR: Could nto build dummy rpm!"
+        echo "ERROR: Could not build dummy rpm!"
     fi
-    pkg=$(awk '/^wrote:/ { print $2 }' < ${tmp}/build.log
+    pkg=$(awk '/^wrote:/ { print $2 }' < ${tmp}/build.log)
     rm ${tmp}/build.log
 #    rpm --no-deps -i "$pkg"
     zypper install -y --force-resolution "$pkg"
