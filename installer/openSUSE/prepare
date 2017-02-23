@@ -11,104 +11,109 @@ DISTROAKA='openSUSE'
 
 # install_dist: see install() in prepare.sh for details.
 install_dist() {
-#    local pkgs='' pkgsasdeps='' params='' asdeps=''
-#    while [ ! "$#" = 0 ]; do
-#        if [ "$1" = "--minimal" ]; then
-#            params='--no-install-recommends'
-#        elif [ "$1" = "--asdeps" ]; then
-#            asdeps='y'
-#        else
-#            break
-#        fi
-#        shift
-#    done
-#    while [ ! "$#" = 0 ]; do
-#        if [ "$1" = '--' ]; then
-#            shift
-#            break
-#        fi
-#        pkgs="$pkgs $1"
-#        shift
-#    done
-#    if [ -n "$asdeps" ]; then
-#        pkgsasdeps="`list_uninstalled_dist '' $pkgs`"
-#    fi
-#    apt-get -y $params install $pkgs `list_uninstalled_dist - "$@"` || return $?
+    local pkgs='' pkgsasdeps='' params='' asdeps=''
+    while [ ! "$#" = 0 ]; do
+        if [ "$1" = "--minimal" ]; then
+            params='--no-recommends'
+        elif [ "$1" = "--asdeps" ]; then
+            asdeps='y'
+        else
+            break
+        fi
+        shift
+    done
+    while [ ! "$#" = 0 ]; do
+        if [ "$1" = '--' ]; then
+            shift
+            break
+        fi
+        pkgs="$pkgs $1"
+       shift
+    done
+    if [ -n "$asdeps" ]; then
+        pkgsasdeps="`list_uninstalled_dist '' $pkgs`"
+    fi
+    zypper install -y $params $pkgs `list_uninstalled_dist - "$@"` || return $?
+# TODO see how we can implement that reasonable with zypper
+# for now we just bloat the chroot
 #    if [ -n "$pkgsasdeps" ]; then
 #        apt-mark auto $pkgsasdeps
 #    fi
-    return
 }
 
 
 # install_pkg_dist: see install_pkg() in prepare.sh for details.
 install_pkg_dist() {
-#    local params=''
-#    if [ "$1" = '--minimal' ]; then
-#        params='--no-install-recommends'
-#        shift
-#    fi
-#    if [ ! "$#" = 0 ]; then
-#        dpkg --force-depends -i "$@" || return $?
-#    fi
-#    apt-get -fy $params install
-    return
+    local params=''
+    if [ "$1" = '--minimal' ]; then
+        params='--no-recommends'
+        shift
+    fi
+    if [ ! "$#" = 0 ]; then
+#        rpm --nodeps -i "$@" || return $?
+        zypper install -y $params "$@" || return $?
+    fi
 }
 
 
 # install_dummy_dist: see install_dummy() in prepare.sh for details.
 install_dummy_dist() {
-#    if [ "$#" = 0 ]; then
-#        return
-#    fi
-#    local pkgname="crouton-$1" pkgprovides="$1"
-#    shift
-#    while [ "$#" != 0 ]; do
-#        if [ "$1" = '--' ]; then
-#            shift
-#            break
-#        fi
-#        pkgprovides="$pkgprovides, $1"
-#        shift
-#    done
-#    local pkgdepends="$1"
-#    if [ "$#" != 0 ]; then
-#        shift
-#        while [ "$#" != 0 ]; do
-#            pkgdepends="$pkgdepends, $1"
-#            shift
-#        done
-#    fi
-#    local tmp="`mktemp -d crouton.XXXXXX --tmpdir=/tmp`"
-#    addtrap "rm -rf '$tmp'"
-#    cat > "$tmp/control" <<EOF
-#Package: $pkgname
-#Version: 0
-#Architecture: all
-#Maintainer: crouton
-#Installed-Size: 0
-#Provides: $pkgprovides
-#Depends: $pkgdepends
-#Section: misc
-#Priority: optional
-#Description: Provides a dummy ${pkgname#*-} for crouton
-#EOF
-#    touch "$tmp/md5sums"
-#    echo '2.0' > "$tmp/debian-binary"
-#    tar -czf "$tmp/control.tar.gz" -C "$tmp" control md5sums
-#    tar -cf "$tmp/data.tar" -T /dev/null
-#    ar r "$tmp/$pkgname.deb" \
-#        "$tmp/debian-binary" "$tmp/control.tar.gz" "$tmp/data.tar"
-#    dpkg -i --force-depends "$tmp/$pkgname.deb"
-#    apt-get -fy install
-    return
+    if [ "$#" = 0 ]; then
+        return
+    fi
+    local pkgname="crouton-$1" pkgprovides="$1"
+    shift
+    while [ "$#" != 0 ]; do
+        if [ "$1" = '--' ]; then
+            shift
+            break
+        fi
+        pkgprovides="$pkgprovides, $1"
+        shift
+    done
+    local pkgdepends="$1"
+    if [ "$#" != 0 ]; then
+        shift
+        while [ "$#" != 0 ]; do
+            pkgdepends="$pkgdepends, $1"
+            shift
+        done
+    fi
+    local tmp="`mktemp -d crouton.XXXXXX --tmpdir=/tmp`"
+    addtrap "rm -rf '$tmp'"
+    cat > "$tmp/dummy.spec" <<EOF
+Name: $pkgname
+Arch: noarch
+Version: 1.0.0
+Release: 1.0.0
+Group: dummy
+Vendor: dummy
+License: %{vendor}
+Provides: $pkgprovides
+Requieres: $pkgdepends
+Summary: Provides a dummy ${pkgname#*-} for crouton
+BuildRoot:      %{_tmppath}/%{name}-%{version}-build
+
+%description
+%{summary}
+
+%files
+EOF
+    rpmbuild --define='_rpmdir ${tmp}' -bb ${tmp}/dummy.spec > ${tmp}/build.log
+    if [ $? != 0 ]
+    then
+        echo "ERROR: Could nto build dummy rpm!"
+    fi
+    pkg=$(awk '/^wrote:/ { print $2 }' < ${tmp}/build.log
+    rm ${tmp}/build.log
+#    rpm --no-deps -i "$pkg"
+    zypper install -y --force-resolution "$pkg"
 }
 
 
 # remove_dist: see remove() in prepare.sh for details.
 remove_dist() {
-#    apt-get -y --purge remove "$@"
-    return
+    zypper -y remove "$@"
 }
 
 
@@ -117,25 +122,13 @@ remove_dist() {
 # corresponding to it (e.g. libc6-dev), so that we can remove it afterwards
 # ("apt-get remove libc-dev" does not remove libc6-dev).
 list_uninstalled_dist() {
-#    local suffix="$1" pkg
-#    shift
-#    for pkg in "$@"; do
-#        # If $pkg is a binary package, apt-cache returns the package name
-#        # itself, so $pkg value stays the same.
-#        # If $pkg is a virtual package, it returns a list of binary packages
-#        # that are able to provide it. If there is a single match, use that.
-#        # If there is no match, it may mean that we are checking for a package
-#        # that we installed manually from a .deb file, so we still use $pkg.
-#        # If there is more than one match, we use $pkg, and apt-get install
-#        # will fail due to selection ambiguity (it is not the purpose of this
-#        # function to pick one of the alternative).
-#        pkg="`apt-cache search --names-only "^$pkg\$" |
-#                  awk 'x{x=""; exit} !x{x=$1} END{print x?x:"'"$pkg"'"}'`"
-#        if ! dpkg-query -l "$pkg" 2>/dev/null | grep -q '^[ih]i'; then
-#            echo -n "$pkg$suffix "
-#        fi
-#    done
-    return
+    local suffix="$1" pkg
+    shift
+    for pkg in "$@"; do
+        if ! zypper se -i "$pkg" 2>/dev/null | grep -q '^i'; then
+            echo -n "$pkg$suffix "
+        fi
+    done
 }
 
 # detect_mirror
@@ -224,34 +217,9 @@ install_mirror_package() {
 # enable network ping for all users
 sudo chmod u+s /usr/bin/ping
 
-# Run dpkg in non-interactive mode
-# export DEBIAN_FRONTEND=noninteractive
-# 
-# # dpkg will auto start some services when installing, and it will ask
-# # policy-rc.d for permissions. We don't want any service to start, so always
-# # return denies.
-# echo exit 101 > /usr/sbin/policy-rc.d
-# chmod +x /usr/sbin/policy-rc.d
-# 
-# # Run debootstrap second stage if it hasn't already happened
-# if [ -r /debootstrap ]; then
-#     # Debootstrap doesn't like anything mounted under /sys or /var when it runs
-#     # We request a re-mount after bootstrapping, so these mounts will be fixed.
-#     sed "s=\\\\040=//=g" /proc/mounts | cut -d' ' -f2 \
-#         | grep -e '^/sys/.' -e '^/var/run' \
-#         | sed -e 's=//= =g;s/^\(\(.*\) (deleted)\)$/\1\n\2/' \
-#         | sort -r | xargs --no-run-if-empty -d '
-# ' -n 1 umount || true
-#     # Start the bootstrap
-#     /debootstrap/debootstrap --second-stage
-#     # Clean contents of /var/run (since we'll always be mounting over it).
-#     rm -rf --one-file-system /var/run/*
-#     # Request a script restart to refresh the mount environment
-#     relaunch_setup
-# else
-#     # Do any pending configuration, in case of an unfortunately-timed Ctrl-C
-#     dpkg --configure -a
-# 
-#     # Fix the keyboard mode in case it got reverted to raw
-#     fixkeyboardmode
-# fi
+# the jeos provides more then we want
+sudo zypper rm -y kernel
+
+# add rpmbuild for dummy packages
+sudo zypper in -y --no-recommends rpmbuild
+
