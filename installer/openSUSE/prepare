@@ -221,6 +221,9 @@ install_mirror_package() {
     return
 }
 
+# enable network ping for all users
+sudo chmod u+s /usr/bin/ping
+
 # Run dpkg in non-interactive mode
 # export DEBIAN_FRONTEND=noninteractive
 # 
