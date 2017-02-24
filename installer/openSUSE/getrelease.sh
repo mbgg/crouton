@@ -13,29 +13,33 @@ if [ "$#" != 2 ] || [ "$1" != '-a' -a "$1" != '-r' ]; then
     exit 2
 fi
 
-sources="${2%/}/etc/os-release"
+sources="${2%/}/usr/lib/os-release"
 if [ ! -s "$sources" ]; then
     exit 1
 fi
 
 # Create release name from /etc/os-release file
 # sed specialist can make that more elegant...
-rel="`grep CPE_NAME /etc/os-release | cut -d ":" -f 4`"
+rel="`grep CPE_NAME "$sources" | cut -d ":" -f 4`"
 if [ $rel = "opensuse" ]
 then
     rel=tumbleweed
 elif [ $rel = "leap" ]
 then
-    ver=`grep CPE_NAME /etc/os-release | cut -d ":" -f 5 | sed 's/"$//'`
+    ver=`grep CPE_NAME "$sources" | cut -d ":" -f 5 | sed 's/"$//'`
     rel=${rel}-${ver}
+elif [ $rel = "tumbleweed" ]
+then
+    continue
 else
     exit 1
 fi
 
 # Print the architecture if requested
 # Why use sed if you know cut...
+sources="${2%/}/etc/products.d/openSUSE.prod"
 if [ "$1" = '-a' ]; then
-    grep "<arch>" etc/products.d/openSUSE.prod | cut -d '>' -f 2 | cut -d '<' -f 1
+    grep "<arch>" "$sources"| cut -d '>' -f 2 | cut -d '<' -f 1
 else
     echo "$rel"
 fi
