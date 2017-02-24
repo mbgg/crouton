@@ -217,9 +217,5 @@ install_mirror_package() {
 # enable network ping for all users
 sudo chmod u+s /usr/bin/ping
 
-# the jeos provides more then we want
-sudo zypper rm -y kernel
-
 # add rpmbuild for dummy packages
 sudo zypper in -y --no-recommends rpmbuild
-
