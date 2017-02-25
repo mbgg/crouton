@@ -30,8 +30,8 @@ cat > '/etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml' <<EOF
 </channel>
 EOF
 
-install xfce4 xfce4-goodies ubuntu=shimmer-themes, \
-        -- dictionaries-common hddtemp xorg
+install openSUSE=pattern:xfce_basis,xfce4 openSUSE=,xfce4-goodies ubuntu=shimmer-themes, \
+        -- openSUSE=,dictionaries-common hddtemp openSUSE=xorg-x11-server,xorg
 
 TIPS="$TIPS
 You can start Xfce via the startxfce4 host command: sudo startxfce4
