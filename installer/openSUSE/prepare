@@ -33,7 +33,7 @@ install_dist() {
     if [ -n "$asdeps" ]; then
         pkgsasdeps="`list_uninstalled_dist '' $pkgs`"
     fi
-    zypper install -y $params $pkgs `list_uninstalled_dist - "$@"` || return $?
+    zypper -q install -y $params $pkgs `list_uninstalled_dist - "$@"` || return $?
 # TODO see how we can implement that reasonable with zypper
 # for now we just bloat the chroot
 #    if [ -n "$pkgsasdeps" ]; then
@@ -51,7 +51,7 @@ install_pkg_dist() {
     fi
     if [ ! "$#" = 0 ]; then
 #        rpm --nodeps -i "$@" || return $?
-        zypper install -y $params "$@" || return $?
+        zypper -q install -y $params "$@" || return $?
     fi
 }
 
@@ -107,13 +107,13 @@ EOF
     pkg=$(awk '/^wrote:/ { print $2 }' < ${tmp}/build.log)
     rm ${tmp}/build.log
 #    rpm --no-deps -i "$pkg"
-    zypper install -y --force-resolution "$pkg"
+    zypper -q install -y --force-resolution "$pkg"
 }
 
 
 # remove_dist: see remove() in prepare.sh for details.
 remove_dist() {
-    zypper -y remove "$@"
+    zypper -q -y remove "$@"
 }
 
 
@@ -218,4 +218,4 @@ install_mirror_package() {
 sudo chmod u+s /usr/bin/ping
 
 # add rpmbuild for dummy packages
-sudo zypper in -y --no-recommends rpmbuild
+sudo zypper -q install -y --no-recommends rpmbuild
