@@ -187,7 +187,7 @@ if [ -z "$inteldriver" -a -n "$backport" ] && release -eq precise; then
     # so replace it with something not broken
     install_dummy xorg -- xserver-xorg$backport libgl1-mesa-glx$backport \
         libgl1-mesa-dri$backport libglu1-mesa xfonts-base x11-apps \
-        x11-session-utils x11-utils x11-xfs-utils x11-xkb-utils \
+        x11-session-utils openSUSE=xorg-x11-util-devel,x11-utils x11-xfs-utils x11-xkb-utils \
         x11-xserver-utils xauth xinit xfonts-utils xkb-data xorg-docs-core \
         xterm x11-common xinput
 else
