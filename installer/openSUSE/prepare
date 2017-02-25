@@ -61,7 +61,7 @@ install_dummy_dist() {
     if [ "$#" = 0 ]; then
         return
     fi
-    local pkgname="crouton-$1" pkgprovides="$1"
+    local pkgname="crouton-$1" pkgprovides="$1" requires=""
     shift
     while [ "$#" != 0 ]; do
         if [ "$1" = '--' ]; then
@@ -79,18 +79,22 @@ install_dummy_dist() {
             shift
         done
     fi
+
+    if [ $pkgdepends ]; then
+        requires="Requires: ${pkgdepends}"
+    fi
+
     local tmp="`mktemp -d crouton.XXXXXX --tmpdir=/tmp`"
     addtrap "rm -rf '$tmp'"
     cat > "$tmp/dummy.spec" <<EOF
 Name: $pkgname
-Arch: noarch
 Version: 1.0.0
 Release: 1.0.0
 Group: dummy
 Vendor: dummy
 License: %{vendor}
 Provides: $pkgprovides
-Requieres: $pkgdepends
+$requires
 Summary: Provides a dummy ${pkgname#*-} for crouton
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
