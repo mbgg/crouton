@@ -8,9 +8,9 @@ DESCRIPTION='GTK-based tools including gdebi, gksu, and a simple browser.'
 
 ### Append to prepare.sh:
 install_dummy network-manager network-manager-gnome
-if $release -ne openSUSE; then
-    install gdebi gksu
+    install openSUSE=,gdebi openSUSE=libgnomesu,gksu
 
+if release -ne tumbleweed; then
     for BROWSER in netsurf-gtk dillo hv3 ""; do
         test -n "$BROWSER"
         if install "$BROWSER"; then
