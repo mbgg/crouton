@@ -19,7 +19,7 @@ fi
 . "${TARGETSDIR:="$PWD"}/common"
 
 ### Append to prepare.sh:
-install openSUSE=xorg-x11-util-devel,x11-utils xclip
+install openSUSE=xprop,x11-utils xclip
 
 compile websocket ''
 
