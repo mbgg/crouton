@@ -117,7 +117,7 @@ EOF
 
 # remove_dist: see remove() in prepare.sh for details.
 remove_dist() {
-    zypper -q -y remove "$@"
+    zypper -q remove -y "$@"
 }
 
 
@@ -217,6 +217,11 @@ install_mirror_package() {
 #    fi
     return
 }
+
+if [ -r /debootstrap.sh ]; then
+    # Clean contents of /var/run (since we'll always be mounting over it).
+    rm -rf --one-file-system /var/run/*
+fi
 
 # enable network ping for all users
 sudo chmod u+s /usr/bin/ping
