@@ -191,8 +191,8 @@ if [ -z "$inteldriver" -a -n "$backport" ] && release -eq precise; then
         x11-xserver-utils xauth xinit xfonts-utils xkb-data xorg-docs-core \
         xterm x11-common xinput
 else
-    install openSUSE=xorg-x11-server,xorg $installvideodrivers -- xserver-xorg-video-all$backport \
-        xserver-xorg-input-vmmouse
+    install openSUSE=xorg-x11-server,xorg $installvideodrivers -- openSUSE=xorg-x11-driver-video,xserver-xorg-video-all$backport \
+        openSUSE=xorg-x11-driver-input,xserver-xorg-input-vmmouse
 fi
 
 # Remove bad video drivers
