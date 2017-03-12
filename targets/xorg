@@ -43,7 +43,7 @@ inteldriver=''
 intelhasfbc=''
 pinmesa=''
 intelfbcsupport='y'
-if [ "${ARCH#arm}" = "$ARCH" ]; then
+if [ "${ARCH#arm}" = "$ARCH" ] && [ "${ARCH#aarch64}" = "$ARCH" ]; then
     inteldriver="xserver-xorg-video-intel$backport"
 
     # If the system has an Intel FBC-capable video card but has too old a driver
