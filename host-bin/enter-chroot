@@ -678,7 +678,7 @@ if [ "$NOLOGIN" != 1 ] && grep -q '^root:' "$passwd" 2>/dev/null; then
         systemd_logind="/usr/lib/systemd/systemd-logind"
     fi
 
-    if [ -x "$CHROOT${systemd_logind}" ] && \
+    if [ -x "$CHROOT$systemd_logind" ] && \
             [ ! -d "$systemd_dir" ] && \
             [ "$CHROOTRELEASE" = 'saucy' -o "$CHROOTRELEASE" = 'trusty' \
             -o "$CHROOTRELEASE" = 'tumbleweed' ]; then

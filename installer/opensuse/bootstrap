@@ -8,15 +8,12 @@
 # directory), $INSTALLERDIR/$DISTRO, $RELEASE, $BOOTSTRAP_RELEASE (if different
 # from $RELEASE), $ARCH, and $MIRROR.
 
-CUR=`pwd`
-
-cp "$INSTALLERDIR/$DISTRO/debootstrap/debootstrap.sh" "$tmp/"
+cp "$INSTALLERDIR/$DISTRO/debootstrap.sh" "$tmp/"
 
 # Grab the release and drop it into the subdirectory
 echo 'Downloading bootstrap files...' 1>&2
-DEBOOTSTRAP_DIR="$tmp" $FAKEROOT \
-    "$tmp/debootstrap.sh" --foreign --arch="$ARCH" \
-    "$RELEASE" "$tmp/$subdir" "$MIRROR" 1>&2
+$FAKEROOT "$tmp/debootstrap.sh" --arch="$ARCH" \
+    "$RELEASE" "$tmp/$subdir" 1>&2
 
 echo 'Remove /dev files as not needed'
 rm -rf ${tmp}/${subdir}/dev/*

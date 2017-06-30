@@ -199,7 +199,7 @@ compile() {
     fi
     shift 2
     echo "Installing dependencies for $out..." 1>&2
-    local pkgs="gcc openSUSE=glibc-devel,libc6-dev $*"
+    local pkgs="gcc opensuse=glibc-devel,libc6-dev $*"
     install --minimal --asdeps $pkgs </dev/null
     echo "Compiling $out..." 1>&2
     local tmp="`mktemp crouton.XXXXXX --tmpdir=/tmp`"
@@ -277,6 +277,7 @@ convert_automake() {
             local extraflags="$2"
             local ofiles
             # local eats the return status: separate the 2 statements
+#            ofiles="`buildsources "${lib}_la" "-Wno-error=int-in-bool-context -fPIC -DPIC"`"
             ofiles="`buildsources "${lib}_la" "-fPIC -DPIC"`"
 
             eval local libadd=\"\$${lib}_la_LIBADD\"

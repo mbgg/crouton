@@ -6,13 +6,13 @@
 # This is a distro-specific continuation of the prepare.sh script.
 
 PKGEXT='rpm'
-DISTROAKA='openSUSE'
+DISTROAKA='opensuse'
 
 
 # install_dist: see install() in prepare.sh for details.
 install_dist() {
     local pkgs='' pkgsasdeps='' params='' asdeps=''
-    while [ ! "$#" = 0 ]; do
+    while [ "$#" != 0 ]; do
         if [ "$1" = "--minimal" ]; then
             params='--no-recommends'
         elif [ "$1" = "--asdeps" ]; then
@@ -50,7 +50,6 @@ install_pkg_dist() {
         shift
     fi
     if [ ! "$#" = 0 ]; then
-#        rpm --nodeps -i "$@" || return $?
         zypper -q install -y $params "$@" || return $?
     fi
 }
@@ -108,9 +107,8 @@ EOF
     then
         echo "ERROR: Could not build dummy rpm!"
     fi
-    pkg=$(awk '/^wrote:/ { print $2 }' < ${tmp}/build.log)
+    pkg="$(awk '/^wrote:/ { print $2 }' < "$tmp/build.log")"
     rm ${tmp}/build.log
-#    rpm --no-deps -i "$pkg"
     zypper -q install -y --force-resolution "$pkg"
 }
 
@@ -122,9 +120,6 @@ remove_dist() {
 
 
 # list_uninstalled_dist: see list_uninstalled() in prepare.sh for details.
-# If the package is virtual (e.g. libc-dev), we need to find the binary package
-# corresponding to it (e.g. libc6-dev), so that we can remove it afterwards
-# ("apt-get remove libc-dev" does not remove libc6-dev).
 list_uninstalled_dist() {
     local suffix="$1" pkg
     shift
@@ -141,7 +136,7 @@ if [ -r /debootstrap.sh ]; then
 fi
 
 # enable network ping for all users
-sudo chmod u+s /usr/bin/ping
+chmod u+s /usr/bin/ping
 
 # add rpmbuild for dummy packages
 sudo zypper -q install -y --no-recommends rpmbuild
