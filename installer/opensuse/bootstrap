@@ -1,0 +1,19 @@
+#!/bin/sh -e
+# Copyright (c) 2016 The crouton Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+# This is a distro-specific bootstrap script, sourced from main.sh, and as such
+# has access to all of the variables set by main.sh, namely $tmp (the temporary
+# directory), $INSTALLERDIR/$DISTRO, $RELEASE, $BOOTSTRAP_RELEASE (if different
+# from $RELEASE), $ARCH, and $MIRROR.
+
+cp "$INSTALLERDIR/$DISTRO/debootstrap.sh" "$tmp/"
+
+# Grab the release and drop it into the subdirectory
+echo 'Downloading bootstrap files...' 1>&2
+$FAKEROOT "$tmp/debootstrap.sh" --arch="$ARCH" \
+    "$RELEASE" "$tmp/$subdir" 1>&2
+
+echo 'Remove /dev files as not needed'
+rm -rf ${tmp}/${subdir}/dev/*
