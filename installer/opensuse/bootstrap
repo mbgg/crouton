@@ -8,12 +8,31 @@
 # directory), $INSTALLERDIR/$DISTRO, $RELEASE, $BOOTSTRAP_RELEASE (if different
 # from $RELEASE), $ARCH, and $MIRROR.
 
-cp "$INSTALLERDIR/$DISTRO/debootstrap.sh" "$tmp/"
+# Tumbleweed
+url_tumbleweed_armv7hl="http://download.opensuse.org/ports/armv7hl/tumbleweed/images/openSUSE-Tumbleweed-ARM-JeOS.armv7hl-rootfs.armv7l-Current.tbz"
+url_tumbleweed_aarch64="http://download.opensuse.org/ports/aarch64/tumbleweed/images/openSUSE-Tumbleweed-ARM-JeOS.aarch64-rootfs.aarch64-Current.tbz"
 
-# Grab the release and drop it into the subdirectory
-echo 'Downloading bootstrap files...' 1>&2
-$FAKEROOT "$tmp/debootstrap.sh" --arch="$ARCH" \
-    "$RELEASE" "$tmp/$subdir" 1>&2
+# Leap
+url_leap_42_2_armv7hl="http://download.opensuse.org/ports/armv7hl/distribution/leap/42.2/appliances/openSUSE-Leap42.2-ARM-X11.armv7-rootfs.armv7l-2017.02.02-Build1.1.tbz"
+url_leap_42_2_aarch64="http://download.opensuse.org/ports/aarch64/distribution/leap/42.2/appliances/openSUSE-Leap42.2-ARM-JeOS.aarch64-rootfs.aarch64-2017.02.02-Build1.1.tbz"
+
+# Rename factory to tumbleweed
+[ "$RELEASE" = "factory" ] && REL=tumbleweed
+# Fix leap release name
+[ "$RELEASE" = "leap-42.2" ] && REL=leap_42_2
+# fix up the good old toolchain/kernel naming conflict
+[ "$ARCH" = "arm64" ] && ARC=aarch64
+
+key=$(echo "\$url_${REL}_${ARC}")
+URL=$(echo $(eval echo "${key}"))
+
+if [ ! "$URL" ]; then
+    echo "Unknown Distribution / Architecture: $key"
+    exit 1
+fi
+
+mkdir -p $tmp/$target
+(cd $tmp/$target; wget -O - $URL | bzip2 -d | tar x)
 
 echo 'Remove /dev files as not needed'
 rm -rf ${tmp}/${subdir}/dev/*
