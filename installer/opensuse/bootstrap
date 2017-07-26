@@ -16,14 +16,15 @@ url_tumbleweed_aarch64="http://download.opensuse.org/ports/aarch64/tumbleweed/im
 url_leap_42_2_armv7hl="http://download.opensuse.org/ports/armv7hl/distribution/leap/42.2/appliances/openSUSE-Leap42.2-ARM-X11.armv7-rootfs.armv7l-2017.02.02-Build1.1.tbz"
 url_leap_42_2_aarch64="http://download.opensuse.org/ports/aarch64/distribution/leap/42.2/appliances/openSUSE-Leap42.2-ARM-JeOS.aarch64-rootfs.aarch64-2017.02.02-Build1.1.tbz"
 
+BOOTSTRAP_RELEASE="$RELEASE"
 # Rename factory to tumbleweed
-[ "$RELEASE" = "factory" ] && REL=tumbleweed
+[ "$RELEASE" = "factory" ] && BOOTSTRAP_RELEASE=tumbleweed
 # Fix leap release name
-[ "$RELEASE" = "leap-42.2" ] && REL=leap_42_2
+[ "$RELEASE" = "leap-42.2" ] && BOOTSTRAP_RELEASE=leap_42_2
 # fix up the good old toolchain/kernel naming conflict
 [ "$ARCH" = "arm64" ] && ARC=aarch64
 
-key=$(echo "\$url_${REL}_${ARC}")
+key=$(echo "\$url_${BOOTSTRAP_RELEASE}_${ARC}")
 URL=$(echo $(eval echo "${key}"))
 
 if [ ! "$URL" ]; then
@@ -31,8 +32,12 @@ if [ ! "$URL" ]; then
     exit 1
 fi
 
-mkdir -p $tmp/$target
-(cd $tmp/$target; wget -O - $URL | bzip2 -d | tar x)
+#mkdir -p $tmp/$subdir
+#$FAKEROOT -- (wget -O - $URL | bzip2 -d | tar x)
+
+cp "$INSTALLERDIR/$DISTRO/download.sh" "$tmp/"
+
+$FAKEROOT "$tmp/download.sh" "$URL" "$tmp/$subdir" 1>&2
 
 echo 'Remove /dev files as not needed'
 rm -rf ${tmp}/${subdir}/dev/*
