@@ -20,13 +20,13 @@ fi
 
 # Create release name from /etc/os-release file
 # sed specialist can make that more elegant...
-rel=$(grep CPE_NAME "$sources" | cut -d ":" -f 4)
-if [ $rel = "opensuse" ]; then
+rel="$(grep CPE_NAME "$sources" | cut -d ":" -f 4)"
+if [ "$rel" = "opensuse" ]; then
     rel=tumbleweed
-elif [ $rel = "leap" ]; then
-    ver=$(grep CPE_NAME "$sources" | cut -d ":" -f 5 | sed 's/"$//')
-    rel=${rel}-${ver}
-elif [ $rel != "tumbleweed" ]; then
+elif [ "$rel" = "leap" ]; then
+    ver="$(grep CPE_NAME "$sources" | cut -d ":" -f 5 | sed 's/"$//')"
+    rel="$rel"-"$ver"
+elif [ "$rel" != "tumbleweed" ]; then
     exit 1
 fi
 
@@ -34,7 +34,7 @@ fi
 # Why use sed if you know cut...
 sources="${2%/}/etc/products.d/openSUSE.prod"
 if [ "$1" = '-a' ]; then
-    arch=$(grep "<arch>" "$sources" | cut -d '>' -f 2 | cut -d '<' -f 1)
+    arch="$(grep "<arch>" "$sources" | cut -d '>' -f 2 | cut -d '<' -f 1)"
     if [ "$arch" = "aarch64" ]; then
         arch="arm64"
     fi

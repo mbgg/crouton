@@ -11,18 +11,19 @@ DISTROAKA='opensuse'
 
 # install_dist: see install() in prepare.sh for details.
 install_dist() {
-    local pkgs='' pkgsasdeps='' params='' asdeps=''
+    local pkgs='' params='' asdeps=''
     while [ "$#" != 0 ]; do
         if [ "$1" = "--minimal" ]; then
             params='--no-recommends'
         elif [ "$1" = "--asdeps" ]; then
-            asdeps='y'
+            shift
+	    continue
         else
             break
         fi
         shift
     done
-    while [ ! "$#" = 0 ]; do
+    while [ "$#" != 0 ]; do
         if [ "$1" = '--' ]; then
             shift
             break
@@ -30,15 +31,7 @@ install_dist() {
         pkgs="$pkgs $1"
        shift
     done
-    if [ -n "$asdeps" ]; then
-        pkgsasdeps="`list_uninstalled_dist '' $pkgs`"
-    fi
     zypper -q install -y $params $pkgs `list_uninstalled_dist - "$@"` || return $?
-# TODO see how we can implement that reasonable with zypper
-# for now we just bloat the chroot
-#    if [ -n "$pkgsasdeps" ]; then
-#        apt-mark auto $pkgsasdeps
-#    fi
 }
 
 
@@ -49,7 +42,7 @@ install_pkg_dist() {
         params='--no-recommends'
         shift
     fi
-    if [ ! "$#" = 0 ]; then
+    if [ "$#" != 0 ]; then
         zypper -q install -y $params "$@" || return $?
     fi
 }
@@ -115,7 +108,7 @@ EOF
 
 # remove_dist: see remove() in prepare.sh for details.
 remove_dist() {
-    zypper -q remove -y "$@"
+    zypper -q remove --clean-deps -y "$@"
 }
 
 
