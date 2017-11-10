@@ -126,4 +126,4 @@ list_uninstalled_dist() {
 chmod u+s /usr/bin/ping
 
 # add rpmbuild for dummy packages
-zypper -q install -y --no-recommends rpmbuild
+install rpmbuild
